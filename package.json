@@ -1,0 +1,36 @@
+{
+  "name": "cross-chain-playground",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  },
+  "dependencies": {
+    "@liquality/bitcoin-bitcore-rpc-provider": "^0.2.3",
+    "@liquality/bitcoin-ledger-provider": "^0.2.3",
+    "@liquality/bitcoin-networks": "^0.2.3",
+    "@liquality/client": "^0.2.3",
+    "@liquality/ethereum-erc20-provider": "^0.2.3",
+    "@liquality/ethereum-ledger-provider": "^0.2.3",
+    "@liquality/ethereum-metamask-provider": "^0.2.3",
+    "@liquality/ethereum-networks": "^0.2.3",
+    "@liquality/ethereum-rpc-provider": "^0.2.3",
+    "core-js": "^2.6.5",
+    "vue": "^2.6.10",
+    "vue-router": "^3.0.3",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.7.0",
+    "@vue/cli-plugin-eslint": "^3.7.0",
+    "@vue/cli-service": "^3.7.0",
+    "@vue/eslint-config-standard": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "sass": "^1.18.0",
+    "sass-loader": "^7.1.0",
+    "vue-template-compiler": "^2.5.21"
+  }
+}
