@@ -1,6 +1,6 @@
 <template>
   <div class="container mt-5 mb-5">
-    <h1>Cross Chain Playground</h1>
+    <h1>Cross-Chain Playground</h1>
     <p class="lead mb-4">@liquality/*</p>
     <div class="">
       <div class="btn-group btn-group-toggle m-2">

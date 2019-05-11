@@ -1,4 +1,4 @@
-# Cross Chain Playground
+# Cross-Chain Playground
 
 ## Project setup
 ```
