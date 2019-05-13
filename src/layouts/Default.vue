@@ -5,9 +5,9 @@
       <div class="col-md-10">
         <Usage />
 
-        <router-view class="repl"></router-view>
+        <router-view class="mb-4"></router-view>
 
-        <div v-if="error" class="card mb-3 text-white bg-danger">
+        <div v-if="error" class="card text-white bg-danger">
           <div class="card-body">
             <pre class="m-0"><code>{{error}}<hr><small>Check console for more details</small></code></pre>
           </div>

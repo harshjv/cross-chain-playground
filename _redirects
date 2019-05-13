@@ -1,10 +1,2 @@
 https://liq-wallet.hv.pizza/* https://cross-chain-playground.hv.pizza/:splat 301!
 https://liq-wallet.netlify.com/* https://cross-chain-playground.hv.pizza/:splat 301!
-
-/node/btc/bitcoin/ https://liquality.io/bitcoinrpc/
-/node/btc/bitcoin_testnet/ https://liquality.io/bitcointestnetrpc/
-
-/node/eth/mainnet/ https://mainnet.infura.io/v3/da99ebc8c0964bb8bb757b6f8cc40f1f/
-/node/eth/ropsten/ https://ropsten.infura.io/v3/da99ebc8c0964bb8bb757b6f8cc40f1f/
-/node/eth/rinkeby/ https://rinkeby.infura.io/v3/da99ebc8c0964bb8bb757b6f8cc40f1f/
-/node/eth/kovan/ https://kovan.infura.io/v3/da99ebc8c0964bb8bb757b6f8cc40f1f/

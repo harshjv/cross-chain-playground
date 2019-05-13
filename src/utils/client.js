@@ -11,7 +11,6 @@ import EthereumMetaMaskProvider from '@liquality/ethereum-metamask-provider'
 import EthereumSwapProvider from '@liquality/ethereum-swap-provider'
 import EthereumErc20SwapProvider from '@liquality/ethereum-erc20-swap-provider'
 
-import { rpcUrls } from '@/utils/rpc'
 import { networks } from '@/utils/networks'
 
 const CLIENT_CACHE = {}
@@ -26,13 +25,13 @@ const LedgerProviders = {
   eth: EthereumLedgerProvider
 }
 
-export const getClient = (chain, network, transport, wallet, erc20, erc20Address, atomicSwap) => {
-  const key = chain + network + transport + wallet + erc20 + erc20Address + atomicSwap
+export const getClient = (chain, network, transport, wallet, erc20, erc20Address, atomicSwap, rpc) => {
+  const key = chain + network + transport + wallet + erc20 + erc20Address + atomicSwap + rpc[chain].join('')
 
   if (CLIENT_CACHE[key]) return CLIENT_CACHE[key]
 
   const client = new Client()
-  client.addProvider(new RpcProviders[chain](...rpcUrls[chain][network]))
+  client.addProvider(new RpcProviders[chain](...rpc[chain]))
 
   let walletProvider
 

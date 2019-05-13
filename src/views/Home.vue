@@ -41,7 +41,7 @@ export default {
     Code
   },
   computed: {
-    ...mapState([ 'chain', 'network', 'transport', 'wallet', 'erc20', 'erc20Address', 'atomicSwap' ]),
+    ...mapState([ 'chain', 'network', 'transport', 'wallet', 'erc20', 'erc20Address', 'atomicSwap', 'btcRpc', 'btcRpcUser', 'btcRpcPass', 'ethRpc' ]),
     client: function () {
       const client = getClient(
         this.chain,
@@ -50,7 +50,11 @@ export default {
         this.wallet,
         this.erc20,
         this.erc20Address,
-        this.atomicSwap
+        this.atomicSwap,
+        {
+          btc: [ this.btcRpc, this.btcRpcUser, this.btcRpcPass ],
+          eth: [ this.ethRpc ]
+        }
       )
 
       this.$win.client = client
