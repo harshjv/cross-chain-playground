@@ -1,7 +1,7 @@
 <template>
   <div>
-    <details :open="!okay" class="mb-3">
-      <summary>Config <small class="label" v-if="okay">&check;</small></summary>
+    <details class="mb-3">
+      <summary>Config</summary>
       <div class="card mt-3">
         <div class="card-body">
           <div v-if="chain === 'btc'">
@@ -42,7 +42,7 @@
               </form>
             </div>
           </div>
-          <button type="button" class="btn btn-primary" @click="update">Update config</button>
+          <button type="button" class="btn btn-primary" @click="update">Update</button>
         </div>
       </div>
     </details>
@@ -61,7 +61,7 @@
         </div>
       </div>
     </details>
-    <details :open="okay">
+    <details open>
       <summary>Usage</summary>
       <div class="card mt-3">
         <div class="card-body">
@@ -81,11 +81,6 @@ import filters from '@/mixins/filters'
 
 export default {
   name: 'Usage',
-  data: function () {
-    return {
-      okay: false
-    }
-  },
   mixins: [
     filters,
     mapQs([ 'btcRpc', 'btcRpcUser', 'btcRpcPass', 'ethRpc', 'erc20Address' ]),
@@ -119,8 +114,6 @@ export default {
           this.erc20Address = this.erc20AddressModel
         }
       }
-
-      this.okay = true
     }
   }
 }

@@ -1,9 +1,16 @@
 <template>
   <div class="mb-2">
     <button @click="click" class="btn-code"><code v-html="highlight(value)"></code></button>
+    <span v-if="!busy" class="ctr ml-2">click to run</span>
     <span v-if="busy" class="ml-2">&middot;&middot;&middot;</span>
-    <div v-if="result" class="alert alert-success mt-3 mb-0">
-      <pre class="m-0"><code>{{result}}</code></pre>
+    <div v-if="result" class="card text-white bg-success mt-3 mb-0">
+      <div class="card-body">
+        <span class="close" @click="result = false">&times;</span>
+        <pre class="m-0"><code>{{result}}</code></pre>
+      </div>
+      <div class="card-footer">
+        <small>Check console for detailed result</small>
+      </div>
     </div>
   </div>
 </template>
@@ -32,6 +39,12 @@ export default {
         this.busy = false
       }
     })
+
+    this.$root.$on('code:error', () => {
+      if (this.busy) {
+        this.busy = false
+      }
+    })
   },
   methods: {
     highlight,
@@ -42,3 +55,20 @@ export default {
   }
 }
 </script>
+
+<style lang="scss">
+.close {
+  margin-top: -15px;
+  margin-right: -10px;
+}
+.ctr {
+  display: none;
+}
+.btn-code {
+  &:hover {
+    & + .ctr {
+      display: inline;
+    }
+  }
+}
+</style>

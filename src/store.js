@@ -16,7 +16,7 @@ export default new Vuex.Store({
     btcRpcPass: 'liquality123',
     ethRpc: 'https://mainnet.infura.io/v3/da99ebc8c0964bb8bb757b6f8cc40f1f',
     erc20: '',
-    erc20Address: '',
+    erc20Address: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
     atomicSwap: ''
   },
   mutations: {

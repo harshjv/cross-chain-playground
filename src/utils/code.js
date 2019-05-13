@@ -3,8 +3,6 @@ import javascript from 'highlight.js/lib/languages/javascript'
 import xml from 'highlight.js/lib/languages/xml'
 import 'highlight.js/styles/github.css'
 
-import { rpcUrls } from '@/utils/rpc'
-
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('xml', xml)
 
