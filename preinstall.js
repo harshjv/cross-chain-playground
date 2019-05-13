@@ -2,6 +2,8 @@ if (process.env.NETLIFY) {
   // Because netlify can't build usb package :/
   // and we don't need it for the web build
 
+  console.log('Removing usb module from package-lock.json')
+
   const lock = require('./package-lock.json')
 
   delete lock.dependencies.usb
