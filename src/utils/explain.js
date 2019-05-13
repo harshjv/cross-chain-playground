@@ -16,6 +16,14 @@ const map = [
   {
     regex: /0x6faa/,
     message: 'You might need to unlock your Ledger device and please try again.'
+  },
+  {
+    regex: /navigator\.usb/,
+    message: 'Your browser doesn\'t support Web USB.'
+  },
+  {
+    regex: /bluetooth/,
+    message: 'Your browser doesn\'t support Web BLE.'
   }
 ]
 

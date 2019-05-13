@@ -16,14 +16,12 @@
       </div>
     </div>
 
-    <div class="card mt-4 mb-3" v-if="atomicSwap === 'true'">
+    <div class="card mt-4" v-if="atomicSwap === 'true'">
       <div class="card-body">
         <h2 class="h5 mb-3">Atomic Swap ⚡️</h2>
         <Code value="const secret = await client.swap.generateSecret('msg')" @click="exec('secret', $event)" />
       </div>
     </div>
-
-    <small class="text-muted" v-if="client"><strong>ProTip&trade;</strong> <code class="ml-2">client</code> is available as <code>window.client</code></small>
   </div>
 </template>
 

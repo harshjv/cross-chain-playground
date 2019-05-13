@@ -61,7 +61,7 @@
         </div>
       </div>
     </details>
-    <details open>
+    <details>
       <summary>Usage</summary>
       <div class="card mt-3">
         <div class="card-body">
