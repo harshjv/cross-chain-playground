@@ -31,7 +31,7 @@ export default new Vuex.Store({
       syncAndNavigate(key, value, init, query => {
         Object.entries(query).map(([ k, v ]) => {
           if (k && v === '') {
-            delete query[key]
+            delete query[k]
           }
 
           if (state[k] !== v) {

@@ -8,6 +8,7 @@ import { checkRpc, getDefaultRpc } from '@/utils/rpc'
 export const checkQs = (key, value, init) => {
   let changed = false
   let query = router.app.$route.query || {}
+
   query = {
     ...query
   }
@@ -79,7 +80,7 @@ export const checkQs = (key, value, init) => {
 
   return {
     query,
-    changed: changed
+    changed
   }
 }
 
