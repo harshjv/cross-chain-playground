@@ -4,8 +4,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build && cp ./_headers ./dist && cp ./_redirects ./dist",
-    "lint": "vue-cli-service lint",
-    "preinstall": "node preinstall.js"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "@liquality/bitcoin-bitcore-rpc-provider": "^0.2.3",
