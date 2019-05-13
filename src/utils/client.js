@@ -36,7 +36,7 @@ export const getClient = (chain, network, transport, wallet, erc20, erc20Address
 
   let walletProvider
 
-  if (walletProvider === 'MetaMask' && chain === 'eth') {
+  if (wallet === 'metamask' && chain === 'eth') {
     walletProvider = new EthereumMetaMaskProvider(window.web3.currentProvider, networks[chain][network])
   } else {
     walletProvider = new LedgerProviders[chain]({ network: networks[chain][network] })
