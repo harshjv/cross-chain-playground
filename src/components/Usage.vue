@@ -97,7 +97,10 @@ export default {
       return getLibs(this.chain, this.transport, this.wallet, this.erc20, this.atomicSwap)
     },
     code: function () {
-      return getCode(this.libs, this.chain, this.network, this.transport, this.erc20Address)
+      return getCode(this.libs, this.chain, this.network, this.transport, this.erc20Address, {
+        btc: [ this.btcRpc, this.btcRpcUser, this.btcRpcPass ],
+        eth: [ this.ethRpc ]
+      })
     }
   },
   methods: {

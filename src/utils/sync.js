@@ -48,25 +48,27 @@ export const checkQs = (key, value, init) => {
     }
   }
 
-  if (!init || !checkRpc(query.chain, query.network, query[query.chain + 'Rpc'])) {
-    changed = true
-    const rpc = getDefaultRpc(query.chain, query.network)
+  if (!init) {
+    if (!checkRpc(query.chain, query.network, query[query.chain + 'Rpc'])) {
+      changed = true
+      const rpc = getDefaultRpc(query.chain, query.network)
 
-    const q = {
-      [query.chain + 'Rpc']: rpc[0]
-    }
+      const q = {
+        [query.chain + 'Rpc']: rpc[0]
+      }
 
-    if (rpc[1]) {
-      q[query.chain + 'RpcUser'] = rpc[1]
-    }
+      if (rpc[1]) {
+        q[query.chain + 'RpcUser'] = rpc[1]
+      }
 
-    if (rpc[2]) {
-      q[query.chain + 'RpcPass'] = rpc[2]
-    }
+      if (rpc[2]) {
+        q[query.chain + 'RpcPass'] = rpc[2]
+      }
 
-    query = {
-      ...(query || query),
-      ...q
+      query = {
+        ...(query || query),
+        ...q
+      }
     }
   }
 

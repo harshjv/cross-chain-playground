@@ -90,7 +90,7 @@ export const highlight = (code) => {
   return hljs.highlight('javascript', code).value
 }
 
-export const getCode = (libs, chain, network, transport, erc20Address) => {
+export const getCode = (libs, chain, network, transport, erc20Address, rpc) => {
   const code = [
     `const client = new Client()`
   ]
@@ -103,7 +103,7 @@ export const getCode = (libs, chain, network, transport, erc20Address) => {
       let args = ''
 
       if (lib.match(/rpc/)) {
-        args = `'` + rpcUrls[chain][network].join(`', '`) + `'`
+        args = `'` + rpc[chain].join(`', '`) + `'`
       }
 
       if (lib.match(/ledger/)) {
