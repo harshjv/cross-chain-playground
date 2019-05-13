@@ -12,6 +12,10 @@ const map = [
   {
     regex: /INS_NOT_SUPPORTED/,
     message: 'Application active on your Ledger device doesn\'t match your current configuration on this page.'
+  },
+  {
+    regex: /0x6faa/,
+    message: 'You might need to unlock your Ledger device and please try again.'
   }
 ]
 

@@ -1,7 +1,7 @@
 <template>
-  <div class="mb-2">
+  <div class="code-line mb-2">
     <button @click="click" class="btn-code"><code v-html="highlight(value)"></code></button>
-    <span v-if="!busy" class="ctr ml-2">click to run</span>
+    <span v-if="!busy" class="badge badge-pill badge-light ml-2">click to run</span>
     <span v-if="busy" class="ml-2">&middot;&middot;&middot;</span>
     <div v-if="result" class="card text-white bg-success mt-3 mb-0">
       <div class="card-body">
@@ -49,8 +49,10 @@ export default {
   methods: {
     highlight,
     click: function () {
-      this.busy = true
-      this.$emit('click', this.id)
+      if (!this.busy) {
+        this.busy = true
+        this.$emit('click', this.id)
+      }
     }
   }
 }
@@ -61,12 +63,15 @@ export default {
   margin-top: -15px;
   margin-right: -10px;
 }
-.ctr {
-  display: none;
+.code-line {
+  .badge {
+    display: none;
+  }
 }
+
 .btn-code {
   &:hover {
-    & + .ctr {
+    & + .badge {
       display: inline;
     }
   }
