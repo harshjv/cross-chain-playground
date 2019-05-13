@@ -3,25 +3,27 @@
     <div class="card mt-4 mb-3">
       <div class="card-body">
         <h2 class="h5 mb-3">Addresses</h2>
-        <Code value="const usedAddresses = await client.wallet.getUsedAddresses()" @click="used" />
-        <Code value="const unusedAddress = await client.wallet.getUnusedAddress()" @click="unused" />
-        <Code value="const balance = await client.chain.getBalance(usedAddresses)" @click="balance" />
+        <Code value="const usedAddresses = await client.wallet.getUsedAddresses()" @click="exec('used', $event)" />
+        <Code value="const unusedAddress = await client.wallet.getUnusedAddress()" @click="exec('unused', $event)" />
+        <Code value="const balance = await client.chain.getBalance(usedAddresses)" @click="exec('balance', $event)" />
       </div>
     </div>
 
     <div class="card mt-4 mb-3">
       <div class="card-body">
         <h2 class="h5 mb-3">Message Signing</h2>
-        <Code value="const sign = await client.wallet.signMessage('hello', unusedAddress)" @click="sign" />
+        <Code value="const sign = await client.wallet.signMessage('hello', unusedAddress)" @click="exec('sign', $event)" />
       </div>
     </div>
 
     <div class="card mt-4 mb-3" v-if="atomicSwap === 'true'">
       <div class="card-body">
         <h2 class="h5 mb-3">Atomic Swap ⚡️</h2>
-        <Code value="const secret = await client.swap.generateSecret('msg')" @click="secret" />
+        <Code value="const secret = await client.swap.generateSecret('msg')" @click="exec('secret', $event)" />
       </div>
     </div>
+
+    <small class="text-muted" v-if="client"><strong>ProTip&trade;</strong> <code class="ml-2">client</code> is available as <code>window.client</code></small>
   </div>
 </template>
 
@@ -41,47 +43,49 @@ export default {
   computed: {
     ...mapState([ 'chain', 'network', 'transport', 'wallet', 'erc20', 'erc20Address', 'atomicSwap' ]),
     client: function () {
-      return getClient(this.chain, this.network, this.transport, this.wallet, this.erc20, this.erc20Address, this.atomicSwap)
+      const client = getClient(
+        this.chain,
+        this.network,
+        this.transport,
+        this.wallet,
+        this.erc20,
+        this.erc20Address,
+        this.atomicSwap
+      )
+
+      this.$win.client = client
+
+      return client
     }
   },
   methods: {
     highlight,
-    unused: async function (id) {
-      const result = await this.client.wallet.getUnusedAddress()
+    exec: async function (method, id) {
+      const result = await this[method]()
+
+      console.log(result)
+
       this.$root.$emit('code:result', {
         id,
         result
       })
     },
-    used: async function (id) {
-      const result = await this.client.wallet.getUsedAddresses()
-      this.$root.$emit('code:result', {
-        id,
-        result
-      })
+    unused: function () {
+      return this.client.wallet.getUnusedAddress()
     },
-    balance: async function (id) {
+    used: function () {
+      return this.client.wallet.getUsedAddresses()
+    },
+    balance: async function () {
       const addresses = await this.client.wallet.getUsedAddresses()
-      const result = await this.client.chain.getBalance(addresses)
-      this.$root.$emit('code:result', {
-        id,
-        result
-      })
+      return this.client.chain.getBalance(addresses)
     },
-    sign: async function (id) {
+    sign: async function () {
       const address = await this.client.wallet.getUnusedAddress()
-      const result = await this.client.wallet.signMessage('hello', address)
-      this.$root.$emit('code:result', {
-        id,
-        result
-      })
+      return this.client.wallet.signMessage('hello', address)
     },
-    secret: async function (id) {
-      const result = await this.client.swap.generateSecret('msg')
-      this.$root.$emit('code:result', {
-        id,
-        result
-      })
+    secret: function () {
+      return this.client.swap.generateSecret('msg')
     }
   }
 }
@@ -93,7 +97,7 @@ button {
     color: inherit;
   }
 }
-.text-white {
+.text-muted, .text-white {
   code, pre {
     color: inherit;
   }

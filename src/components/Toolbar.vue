@@ -69,7 +69,7 @@
       </li>
     </ul>
 
-    <ul class="nav nav-pills flex-column mb-4" v-if="wallet === 'ledger'">
+    <ul class="nav nav-pills flex-column mb-4">
       <li class="nav-item">
         <span class="nav-link small">EXPERIMENT 🧪</span>
       </li>
