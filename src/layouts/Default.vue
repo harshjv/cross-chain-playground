@@ -69,14 +69,14 @@ export default {
     notSupported: function () {
       if (this.transport === 'ble' && !this.$win.navigator.bluetooth) {
         return {
-          message: 'Your browser doesn\'t support WebBLE. Click here to know more about supported browsers.',
+          message: 'Your browser doesn\'t support Web BLE. Click here to know more about supported browsers.',
           link: 'https://caniuse.com/#feat=web-bluetooth'
         }
       }
 
       if (this.transport === 'usb' && !this.$win.navigator.usb) {
         return {
-          message: 'Your browser doesn\'t support WebUSB. Click here to know more about supported browsers.',
+          message: 'Your browser doesn\'t support Web USB. Click here to know more about supported browsers.',
           link: 'https://caniuse.com/#feat=webusb'
         }
       }
