@@ -1,4 +1,4 @@
-const rpcUrls = {
+export const rpcUrls = {
   btc: {
     bitcoin: [ 'https://liquality.io/bitcoinrpc/', 'liquality', 'liquality123' ],
     bitcoin_testnet: [ 'https://liquality.io/bitcointestnetrpc/', 'bitcoin', 'local321' ]
@@ -11,6 +11,14 @@ const rpcUrls = {
   }
 }
 
-export {
-  rpcUrls
+export const checkRpc = (chain, network, rpc) => {
+  if (!rpc) return false
+
+  return true
+
+  // return rpcUrls[chain][network] && rpcUrls[chain][network][0] === rpc
+}
+
+export const getDefaultRpc = (chain, network) => {
+  return rpcUrls[chain][network]
 }

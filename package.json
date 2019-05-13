@@ -4,19 +4,28 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build && cp ./_headers ./dist && cp ./_redirects ./dist",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "preinstall": "node preinstall.js"
   },
   "dependencies": {
     "@liquality/bitcoin-bitcore-rpc-provider": "^0.2.3",
     "@liquality/bitcoin-ledger-provider": "^0.2.3",
     "@liquality/bitcoin-networks": "^0.2.3",
+    "@liquality/bitcoin-swap-provider": "^0.2.3",
     "@liquality/client": "^0.2.3",
     "@liquality/ethereum-erc20-provider": "^0.2.3",
+    "@liquality/ethereum-erc20-swap-provider": "^0.2.3",
     "@liquality/ethereum-ledger-provider": "^0.2.3",
     "@liquality/ethereum-metamask-provider": "^0.2.3",
     "@liquality/ethereum-networks": "^0.2.3",
     "@liquality/ethereum-rpc-provider": "^0.2.3",
+    "@liquality/ethereum-swap-provider": "^0.2.3",
+    "bootstrap": "^4.3.1",
     "core-js": "^2.6.5",
+    "highlight.js": "^9.15.6",
+    "jquery": "^3.4.1",
+    "popper.js": "^1.15.0",
+    "uuid": "^3.3.2",
     "vue": "^2.6.10",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1"
@@ -31,6 +40,7 @@
     "eslint-plugin-vue": "^5.0.0",
     "sass": "^1.18.0",
     "sass-loader": "^7.1.0",
+    "sass-resources-loader": "^2.0.0",
     "vue-template-compiler": "^2.5.21"
   }
 }

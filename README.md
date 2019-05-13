@@ -1,4 +1,5 @@
-# Cross-Chain Playground
+# Cross-Chain Playground [![Netlify Status](https://api.netlify.com/api/v1/badges/de9078bd-b94c-4e9c-9e9a-cc3d37bb3e00/deploy-status)](https://app.netlify.com/sites/liq-wallet/deploys)
+
 
 ## Project setup
 ```

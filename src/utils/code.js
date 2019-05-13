@@ -1,17 +1,30 @@
+import hljs from 'highlight.js/lib/highlight'
+import javascript from 'highlight.js/lib/languages/javascript'
+import xml from 'highlight.js/lib/languages/xml'
+import 'highlight.js/styles/github.css'
+
 import { rpcUrls } from '@/utils/rpc'
+
+hljs.registerLanguage('javascript', javascript)
+hljs.registerLanguage('xml', xml)
 
 export const CamelCase = str => `-${str}`.replace(/-([a-z])/g, g => g[1].toUpperCase())
 
 export const chainMap = {
   btc: 'Bitcoin',
-  eth: 'Ethereum'
+  eth: 'Ethereum',
+  ethereum: 'eth',
+  bitcoin: 'btc',
+  Ethereum: 'eth',
+  Bitcoin: 'btc'
 }
 
-export const getLibs = (chain, transport, wallet, erc20) => {
-  const common = [ 'client' ]
+export const getLibs = (chain, transport, wallet, erc20, atomicSwap) => {
+  let libs = [ 'client' ]
+  let swapProvider = false
 
   if (chain === 'btc') {
-    return common.concat([
+    libs = libs.concat([
       'bitcoin-bitcore-rpc-provider',
       'bitcoin-ledger-provider',
       'bitcoin-networks'
@@ -19,35 +32,65 @@ export const getLibs = (chain, transport, wallet, erc20) => {
   }
 
   if (chain === 'eth') {
-    const eth = [
+    libs = libs.concat([
       'ethereum-rpc-provider',
       `ethereum-${wallet.toLowerCase()}-provider`,
       'ethereum-networks'
-    ]
+    ])
 
-    if (erc20) {
-      eth.push('ethereum-erc20-provider')
+    if (erc20 === 'true') {
+      libs.push('ethereum-erc20-provider')
     }
-
-    return common.concat(eth)
   }
+
+  if (atomicSwap === 'true') {
+    if (chain === 'btc') {
+      swapProvider = 'bitcoin-swap-provider'
+    } else {
+      if (erc20 === 'true') {
+        swapProvider = 'ethereum-erc20-swap-provider'
+      } else {
+        swapProvider = 'ethereum-swap-provider'
+      }
+    }
+  }
+
+  if (swapProvider) {
+    libs = libs.concat([ swapProvider ])
+  }
+
+  return libs
 }
 
 export const makeLibsImportable = (libs, type) => {
-  return libs.map(lib => {
+  const code = libs.map(lib => {
+    const extraNewLine = lib === 'client'
+
     if (type === 'es6') {
-      return `import ${CamelCase(lib)} from @liquality/${lib}`
+      return `import ${CamelCase(lib)} from @liquality/${lib}${extraNewLine ? '\n' : ''}`
     }
     if (type === 'es5') {
-      return `const ${CamelCase(lib)} = require(@liquality/${lib})`
+      return `const ${CamelCase(lib)} = require(@liquality/${lib})${extraNewLine ? '\n' : ''}`
     }
 
-    /* eslint-disable-next-line no-useless-escape */
-    return `<script src="https://cdn.jsdelivr.net/npm/@liquality/${lib}@0.2.3/dist/${lib}.min.js"><\/script>\n<!-- available as window.${CamelCase(lib)} -->\n`
+    return [
+      `<script src="https://cdn.jsdelivr.net/npm/@liquality/${lib}@0.2.3/dist/${lib}.min.js"></script>`,
+      `<!-- available as window.${CamelCase(lib)} -->\n`
+    ].join('\n')
   }).join('\n')
+
+  if (type === 'web') {
+    return hljs.highlight('xml', code).value
+  }
+
+  return hljs.highlight('javascript', code).value
 }
 
-export const getCode = (libs, chain, networkName, transport, erc20Address) => {
+export const highlight = (code) => {
+  return hljs.highlight('javascript', code).value
+}
+
+export const getCode = (libs, chain, network, transport, erc20Address) => {
   const code = [
     `const client = new Client()`
   ]
@@ -60,18 +103,18 @@ export const getCode = (libs, chain, networkName, transport, erc20Address) => {
       let args = ''
 
       if (lib.match(/rpc/)) {
-        args = `'` + rpcUrls[chain][networkName].join(`', '`) + `'`
+        args = `'` + rpcUrls[chain][network].join(`', '`) + `'`
       }
 
       if (lib.match(/ledger/)) {
-        args = `{ network: ${chainMap[chain]}Networks.${networkName} }`
+        args = `{ network: ${chainMap[chain]}Networks.${network} }`
       }
 
       if (lib.match(/metamask/)) {
-        args = `window.web3.currentProvider, EthereumNetworks.${networkName}`
+        args = `window.web3.currentProvider, EthereumNetworks.${network}`
       }
 
-      if (lib.match(/erc20/)) {
+      if (lib.match(/erc20-provider/)) {
         args = `'${erc20Address}'` || `'contractAddress'`
       }
 
@@ -84,5 +127,5 @@ export const getCode = (libs, chain, networkName, transport, erc20Address) => {
       return obj
     })
 
-  return code.concat(other).join('\n')
+  return hljs.highlight('javascript', code.concat(other).join('\n')).value
 }
