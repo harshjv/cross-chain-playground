@@ -23,10 +23,11 @@
           </div>
         </div>
 
-        <p><small class="text-muted"><strong>ProTip&trade;</strong> <code class="ml-2">client</code> is available as <code>window.client</code></small></p>
+        <p class="mb-2"><small class="text-muted"><strong>ProTip&trade;</strong> <code class="ml-2">client</code> is available as <code>window.client</code></small></p>
         <p v-if="wallet === 'ledger'"><small class="text-muted">
           <strong>Minimum requirements</strong>
-          <span class="ml-2">A Ledger Nano S with Ledger Secure Element v1.5.5 &amp; MCU: 1.7 or above, or a Ledger Nano X.</span>
+          <span v-if="transport === 'usb'" class="ml-2">A Ledger Nano S with Ledger Secure Element v1.5.5 &amp; MCU: 1.7 or above, or a Ledger Nano X.</span>
+          <span v-if="transport === 'ble'" class="ml-2">A Ledger Nano X.</span>
         </small></p>
       </div>
     </div>

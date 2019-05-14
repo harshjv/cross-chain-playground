@@ -2,7 +2,15 @@
   <div class="code-line mb-2">
     <button @click="click" class="btn-code"><code v-html="highlight(value)"></code></button>
     <span v-if="!busy" class="badge badge-pill badge-light ml-2">click to run</span>
-    <span v-if="busy" class="ml-2">&middot;&middot;&middot;</span>
+    <div class="loader ml-2" v-if="busy">
+      <div class="loader-inner pacman">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
+    </div>
     <div v-if="result" class="card text-white bg-success mt-3 mb-3">
       <div class="card-body">
         <span class="close" @click="result = false">&times;</span>

@@ -1,5 +1,6 @@
-@import "overrides.scss";
-@import "bootstrap/bootstrap.scss";
+@import "overrides";
+@import "bootstrap/bootstrap";
+@import "animation/pacman";
 
 html {
   font-size: 16px;
