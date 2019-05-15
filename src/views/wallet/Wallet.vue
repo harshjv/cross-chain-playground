@@ -2,7 +2,7 @@
   <div>
     <div class="text-center" v-if="!transport">
       <h2>Select your wallet</h2>
-      <p class="lead">{{currency.name}} on {{network | pretty}}</p>
+      <p class="lead">{{currency.ticker}} on {{network | pretty}}</p>
       <div class="row justify-content-center mb-4">
         <div class="col-md-4" v-for="w in wallets">
           <div :class="{

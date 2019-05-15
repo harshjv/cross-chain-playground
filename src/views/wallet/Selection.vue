@@ -9,7 +9,7 @@
             'grayout': currency && c.name !== currency.name
           }" @click="selectCurrency(c)">
           <div class="card-body">
-            <h2 class="h5 mb-0">{{c.name}}</h2>
+            <h2 class="h5 mb-0">{{c.ticker}}</h2>
           </div>
         </div>
       </div>

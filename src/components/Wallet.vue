@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="text-center">{{currency.name}} on {{network | pretty}}</h2>
+    <h2 class="text-center">{{currency.ticker}} on {{network | pretty}}</h2>
     <p class="text-center lead mb-5">Using {{wallet.name}} via {{transport | pretty}}</p>
 
     <div class="row mb-4">
