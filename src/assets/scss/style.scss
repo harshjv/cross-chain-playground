@@ -13,7 +13,7 @@ html {
   text-transform: uppercase;
 }
 
-.nav-link.small, small.label {
+.nav-link.small, small.label, .small.label {
   @extend %label;
 }
 
@@ -28,4 +28,16 @@ html {
   padding-left: 0;
   padding-right: 0;
   text-align: left;
+}
+
+.grayout {
+  opacity: 0.5;
+}
+
+.code-font {
+  font-family: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.no-events {
+  pointer-events: none;
 }

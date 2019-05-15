@@ -125,3 +125,26 @@ $a-size: 6px;
     left: 28px;
   }
 }
+
+.loader-white {
+  .pacman {
+    > div:first-of-type {
+      border-top: $a-size solid #fff;
+      border-left: $a-size solid #fff;
+      border-bottom: $a-size solid #fff;
+    }
+
+    > div:nth-child(2) {
+      border-top: $a-size solid #fff;
+      border-left: $a-size solid #fff;
+      border-bottom: $a-size solid #fff;
+    }
+
+    > div:nth-child(3),
+    > div:nth-child(4),
+    > div:nth-child(5),
+    > div:nth-child(6) {
+      background-color: #fff;
+    }
+  }
+}

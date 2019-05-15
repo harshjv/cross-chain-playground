@@ -1,5 +1,5 @@
 <template>
-  <div class="container mt-4 mb-5">
+  <div>
     <div class="row">
       <Toolbar class="col-md-2" />
       <div class="col-md-10">
@@ -13,15 +13,7 @@
 
         <router-view class="mb-4"></router-view>
 
-        <div v-if="error" class="card text-white bg-danger mb-4">
-          <div class="card-body">
-            <div v-if="explainError" class="mb-3">{{explainError}}</div>
-            <pre class="m-0"><code>{{error}}</code></pre>
-          </div>
-          <div class="card-footer">
-            <small>Check console for more details</small>
-          </div>
-        </div>
+        <Error class="mb-4" :error="error" v-if="error" />
 
         <p class="mb-2"><small class="text-muted"><strong>ProTip&trade;</strong> <code class="ml-2">client</code> is available as <code>window.client</code></small></p>
         <p v-if="wallet === 'ledger'"><small class="text-muted">
@@ -39,27 +31,25 @@ import { mapState, mapActions } from 'vuex'
 
 import Toolbar from '@/components/Toolbar'
 import Usage from '@/components/Usage'
-
-import explain from '@/utils/explain'
+import Error from '@/components/Error'
 
 export default {
   name: 'Default',
   components: {
     Toolbar,
-    Usage
+    Usage,
+    Error
   },
   created: function () {
     this.init()
   },
   data: function () {
     return {
-      explainError: false,
       error: false
     }
   },
   errorCaptured: function (e) {
-    this.explainError = explain(e)
-    this.error = JSON.stringify(e, null, 2)
+    this.error = e
     this.$root.$emit('code:error', {
       error: e
     })
