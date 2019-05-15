@@ -89,6 +89,9 @@
             </div>
           </div>
         </div>
+        <div class="card mb-2" v-if="qrcode">
+          <div class="card-body" v-html="qrcode" />
+        </div>
         <p class="text-center"><small @click="swap = !swap" class="label clickable">Toggle atomic swap screen</small></p>
       </div>
     </div>
@@ -98,6 +101,8 @@
 </template>
 
 <script>
+import QRCode from 'qrcode'
+
 import filters from '@/mixins/filters'
 import { getClient } from '@/utils/client'
 import { getDefaultRpc } from '@/utils/rpc'
@@ -132,7 +137,8 @@ export default {
       swap: false,
       cp: {
         currency: 'BTC'
-      }
+      },
+      qrcode: null
     }
   },
   computed: {
@@ -164,6 +170,20 @@ export default {
     prepare: async function () {
       try {
         this.address = await this.client.wallet.getUnusedAddress()
+
+        const uri = [
+          this.currency.name.toLowerCase(),
+          this.address.address
+        ].join(':')
+
+        QRCode.toString(uri, {
+          type: 'svg'
+        }, (err, svg) => {
+          if (err) throw err
+
+          this.qrcode = svg
+        })
+
         const usedAddresses = await this.client.wallet.getUsedAddresses()
         this.balance = await this.client.chain.getBalance(usedAddresses)
       } catch (e) {
