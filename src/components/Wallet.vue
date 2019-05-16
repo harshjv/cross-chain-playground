@@ -52,10 +52,10 @@
           </div>
         </div>
         <div v-else>
-          <div class="card mb-2" v-for="offer in [...offers, ...offers]">
+          <div class="card mb-2" v-for="offer in offers">
             <div class="card-body">
-              <p class="lead">Swap with {{offer.addr}}</p>
-              <p class="mb-0">Max: {{offer.max}} {{offer.base.toUpperCase()}}</p>
+              <p class="lead">Swap with {{offer.alias}}</p>
+              <p class="mb-0">Sell your {{offer.want.currency.toUpperCase()}} for {{offer.have.currency.toUpperCase()}} (Rate {{offer.rate}})</p>
             </div>
           </div>
         </div>
@@ -67,9 +67,9 @@
           <div class="card-body">
             <h5 class="card-title">Network Status</h5>
             <div class="font-weight-normal">
-              <p v-if="agents || offers" class="mb-0">
-                <span v-if="agents">{{agents.length}} Agent</span>
-                <span v-if="offers"> / {{offers.length}} Offer</span>
+              <p v-if="offers" class="mb-0">
+                <span>{{agents}} Agent</span>
+                <span v-if="offers"> / {{offers.length}} Offers</span>
               </p>
               <Pacman v-else />
             </div>
@@ -150,7 +150,7 @@ export default {
         currency: 'BTC'
       },
       qrcode: null,
-      agents: null,
+      agents: 0,
       offers: null,
 
       liquidity: null,
@@ -187,31 +187,49 @@ export default {
   methods: {
     prepare: async function () {
       try {
-        this.agents = await this.client.discovery.getAgents()
+        const getUnusedPromise = this.client.wallet.getUnusedAddress()
+        const _offers = await this.client.discovery.getOffers()
+        const o = []
+        const c = {}
 
-        this.offers = await Promise.all(this.agents.map(agent => {
-          return this.$HTTP.get(`${agent.address}/offers.json`).then(d => d.data)
-        }))
+        _offers.forEach(({ alias, address, offers }) => {
+          this.agents = this.agents + 1
+          offers.forEach(offer => {
+            if (!c[offer.currency]) c[offer.currency] = {}
 
-        this.liquidity = this.offers.reduce((acc, offer) => {
-          if (!acc[offer.base]) acc[offer.base] = 0
-          acc[offer.base] += offer.max
-
-          Object.keys(offer.offers).map(coin => {
-            const o = offer.offers[coin]
-
-            if (!acc[coin]) acc[coin] = 0
-            acc[coin] += o.max
+            o.push({
+              alias,
+              address,
+              ...offer
+            })
           })
+        })
 
-          return acc
-        }, {})
+        console.log(o)
 
-        this.liquidityString = Object.keys(this.liquidity).map(key => {
-          return `${this.liquidity[key]} ${key.toUpperCase()}`
-        }).join(' / ')
+        // asd
 
-        this.address = await this.client.wallet.getUnusedAddress()
+        this.offers = o
+
+        // this.liquidity = this.offers.reduce((acc, offer) => {
+        //   if (!acc[offer.base]) acc[offer.base] = 0
+        //   acc[offer.base] += offer.max
+        //
+        //   Object.keys(offer.offers).map(coin => {
+        //     const o = offer.offers[coin]
+        //
+        //     if (!acc[coin]) acc[coin] = 0
+        //     acc[coin] += o.max
+        //   })
+        //
+        //   return acc
+        // }, {})
+        //
+        // this.liquidityString = Object.keys(this.liquidity).map(key => {
+        //   return `${this.liquidity[key]} ${key.toUpperCase()}`
+        // }).join(' / ')
+
+        this.address = await getUnusedPromise
 
         const uri = [
           this.currency.name.toLowerCase(),
