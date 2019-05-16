@@ -2,13 +2,34 @@
   <div>
     <h2 class="text-center">{{currency.ticker}} on {{network | pretty}}</h2>
     <p class="text-center lead mb-5">Using {{wallet.name}} via {{transport | pretty}}</p>
-
+    <div class="text-center row justify-content-center mb-5">
+      <div class="col-md-3">
+        <div :class="{
+            'card mt-3 mb-3 clickable': true,
+            'grayout': screen !== 'wallet'
+          }" @click="screen = 'wallet'">
+          <div class="card-body">
+            <h2 class="h5 mb-0">Wallet</h2>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div :class="{
+            'card mt-3 mb-3 clickable': true,
+            'grayout': screen !== 'order-book'
+          }" @click="screen = 'order-book'">
+          <div class="card-body">
+            <h2 class="h5 mb-0">Order Book</h2>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="row mb-4">
       <div :class="{
           'col-md-8': true,
-          'grayout no-events': !balance
+          'grayout no-events': false
         }">
-        <div class="card" v-if="!swap">
+        <div class="card" v-if="screen === 'wallet'">
           <div class="card-body">
             <h5 class="card-title">Send {{currency.ticker}}</h5>
             <div class="form-group">
@@ -31,42 +52,10 @@
           </div>
         </div>
         <div v-else>
-          <div class="card">
+          <div class="card mb-2" v-for="offer in [...offers, ...offers]">
             <div class="card-body">
-              <h5 class="card-title">
-                Swap {{currency.ticker}} with
-                <select v-model="cp.currency">
-                  <option :value="c.ticker" v-for="c in currencies">{{c.ticker}}</option>
-                </select>
-              </h5>
-              <p class="mb-2"><small class="label">Offer</small></p>
-              <div class="form-group">
-                <label for="amount">{{currency.ticker}} to sell <span class="text-primary">*</span></label>
-                <input v-model="amount" autocomplete="off" type="text" class="form-control" id="amount" placeholder="5000">
-                <small class="form-text text-muted clickable" @click="amount = balance">Click here to select max amount (doesn't account network transaction fee)</small>
-              </div>
-              <div class="form-group mb-4">
-                <label for="amount">Expected {{cp.currency.toUpperCase()}} in return <span class="text-primary">*</span></label>
-                <input v-model="amount" autocomplete="off" type="text" class="form-control" id="amount" placeholder="5000">
-                <small class="form-text text-muted clickable" @click="amount = balance">Click here to select max amount (doesn't account network transaction fee)</small>
-              </div>
-              <p class="mb-2"><small class="label">Addresses</small></p>
-              <div class="form-group">
-                <label for="x">your {{cp.currency.toUpperCase()}} address <span class="text-primary">*</span></label>
-                <input autocomplete="off" type="text" class="form-control" id="x" placeholder="0x...">
-              </div>
-              <div class="form-group">
-                <label for="x">Address of {{cp.currency.toUpperCase()}} seller <span class="text-primary">*</span></label>
-                <input autocomplete="off" type="text" class="form-control" id="x" placeholder="0x...">
-              </div>
-              <button :class="{
-                'btn': true,
-                'btn-light no-events': busy,
-                'btn-primary': !busy
-              }" type="button">
-                <span v-if="!busy">Initiate</span>
-                <span v-else><Pacman />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-              </button>
+              <p class="lead">Swap with {{offer.addr}}</p>
+              <p class="mb-0">Max: {{offer.max}} {{offer.base.toUpperCase()}}</p>
             </div>
           </div>
         </div>
@@ -74,6 +63,29 @@
         <Result v-if="result" :result="result" class="mt-4" />
       </div>
       <div class="col-md-4">
+        <div class="card mb-2" v-if="screen === 'order-book'">
+          <div class="card-body">
+            <h5 class="card-title">Network Status</h5>
+            <div class="font-weight-normal">
+              <p v-if="agents || offers" class="mb-0">
+                <span v-if="agents">{{agents.length}} Agent</span>
+                <span v-if="offers"> / {{offers.length}} Offer</span>
+              </p>
+              <Pacman v-else />
+            </div>
+          </div>
+        </div>
+        <div class="card mb-2" v-if="screen === 'order-book'">
+          <div class="card-body">
+            <h5 class="card-title">Liquidity</h5>
+            <div class="font-weight-normal">
+              <p v-if="liquidityString" class="mb-0">
+                {{liquidityString}}
+              </p>
+              <Pacman v-else />
+            </div>
+          </div>
+        </div>
         <div class="card mb-2">
           <div class="card-body">
             <h5 class="card-title">Account</h5>
@@ -89,10 +101,9 @@
             </div>
           </div>
         </div>
-        <div class="card mb-2" v-if="qrcode">
+        <div class="card" v-if="qrcode">
           <div class="card-body" v-html="qrcode" />
         </div>
-        <p class="text-center"><small @click="swap = !swap" class="label clickable">Toggle atomic swap screen</small></p>
       </div>
     </div>
 
@@ -134,11 +145,18 @@ export default {
       busy: false,
       result: null,
       error: false,
-      swap: false,
+
       cp: {
         currency: 'BTC'
       },
-      qrcode: null
+      qrcode: null,
+      agents: null,
+      offers: null,
+
+      liquidity: null,
+      liquidityString: null,
+
+      screen: 'wallet'
     }
   },
   computed: {
@@ -169,6 +187,30 @@ export default {
   methods: {
     prepare: async function () {
       try {
+        this.agents = await this.client.discovery.getAgents()
+
+        this.offers = await Promise.all(this.agents.map(agent => {
+          return this.$HTTP.get(`${agent.address}/offers.json`).then(d => d.data)
+        }))
+
+        this.liquidity = this.offers.reduce((acc, offer) => {
+          if (!acc[offer.base]) acc[offer.base] = 0
+          acc[offer.base] += offer.max
+
+          Object.keys(offer.offers).map(coin => {
+            const o = offer.offers[coin]
+
+            if (!acc[coin]) acc[coin] = 0
+            acc[coin] += o.max
+          })
+
+          return acc
+        }, {})
+
+        this.liquidityString = Object.keys(this.liquidity).map(key => {
+          return `${this.liquidity[key]} ${key.toUpperCase()}`
+        }).join(' / ')
+
         this.address = await this.client.wallet.getUnusedAddress()
 
         const uri = [

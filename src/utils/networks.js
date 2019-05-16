@@ -2,7 +2,22 @@ import BitcoinNetworks from '@liquality/bitcoin-networks'
 import EthereumNetworks from '@liquality/ethereum-networks'
 
 export const networks = {
-  btc: BitcoinNetworks,
+  btc: {
+    ...BitcoinNetworks,
+    bitcoin_regtest: {
+      name: 'bitcoin_testnet',
+      pubKeyHash: '6F',
+      scriptHash: 'C4',
+      coinType: '1',
+      explorerUrl: 'https://testnet.blockchain.info',
+      wif: 0xef,
+      bip32: {
+        public: 0x043587cf,
+        private: 0x04358394
+      },
+      isTestnet: true
+    }
+  },
   eth: EthereumNetworks
 }
 
