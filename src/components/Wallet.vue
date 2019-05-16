@@ -30,11 +30,11 @@
             </button>
           </div>
         </div>
-        <div v-else>
+        <div v-else class="grayout no-events">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">
-                Swap {{currency.ticker}} with
+                [WIP] Swap {{currency.ticker}} with
                 <select v-model="cp.currency">
                   <option :value="c.ticker" v-for="c in currencies">{{c.ticker}}</option>
                 </select>
