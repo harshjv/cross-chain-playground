@@ -1,8 +1,8 @@
 <template>
   <div>
     <div class="text-center" v-if="!transport">
-      <h2>Select your wallet</h2>
-      <p class="lead">{{currency.ticker}} on {{network | pretty}}</p>
+      <h2>{{currency.ticker}} on {{network | pretty}}</h2>
+      <p class="lead">Select your wallet</p>
       <div class="row justify-content-center mb-4">
         <div class="col-md-4" v-for="w in wallets">
           <div :class="{
