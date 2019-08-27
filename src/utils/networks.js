@@ -18,7 +18,10 @@ export const networks = {
       isTestnet: true
     }
   },
-  eth: EthereumNetworks
+  eth: {
+    ...EthereumNetworks,
+    local: undefined
+  }
 }
 
 export const getNetworkNames = (chain) => {

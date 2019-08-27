@@ -58,7 +58,8 @@ export const getClient = (chain, network, transport, wallet, erc20, erc20Address
     }
   } else {
     if (atomicSwap === 'true') {
-      client.addProvider(new BitcoinSwapProvider(networks[chain][network]))
+      console.log('fine', networks[chain][network])
+      client.addProvider(new BitcoinSwapProvider({ network: networks[chain][network] }))
     }
   }
 

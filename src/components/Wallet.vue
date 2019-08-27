@@ -52,12 +52,17 @@
           </div>
         </div>
         <div v-else>
-          <div class="card mb-2" v-for="offer in offers">
+          <div class="card mb-2 clickable" v-for="offer in offers" :key="offer.want.currency + '-' + offer.have.currency" @click="swap(offer)">
             <div class="card-body">
-              <p class="lead">Swap with {{offer.alias}}</p>
-              <p class="mb-0">Sell your {{offer.want.currency.toUpperCase()}} for {{offer.have.currency.toUpperCase()}} (Rate {{offer.rate}})</p>
+              <p class="lead">Swap your {{offer.want.currency.toUpperCase()}} with {{offer.alias}}</p>
+              <p class="mb-0">1 {{offer.want.currency.toUpperCase()}} = {{offer.rate}} {{offer.have.currency.toUpperCase()}}</p>
             </div>
           </div>
+
+          <div v-if="swapProg" class="text-center mt-3"><Pacman /></div>
+
+          <button v-if="canUserClaim" @click="claim" class="btn btn-primary btn-lg btn-block text-center">Claim your funds</button>
+          <button v-if="swapDone" class="btn btn-success btn-lg btn-block text-center">Done!</button>
         </div>
 
         <Result v-if="result" :result="result" class="mt-4" />
@@ -112,16 +117,31 @@
 </template>
 
 <script>
+import axios from 'axios'
 import QRCode from 'qrcode'
 
 import filters from '@/mixins/filters'
 import { getClient } from '@/utils/client'
 import { getDefaultRpc } from '@/utils/rpc'
 import { currencies } from '@/utils/currency'
+import { getOffers } from '@/utils/discovery'
 
 import ErrorComp from '@/components/Error'
 import Pacman from '@/components/Pacman'
 import Result from '@/components/Result'
+
+import Client from '@liquality/client'
+
+import BitcoinBitcoreRpcProvider from '@liquality/bitcoin-bitcore-rpc-provider'
+import BitcoinLedgerProvider from '@liquality/bitcoin-ledger-provider'
+import BitcoinSwapProvider from '@liquality/bitcoin-swap-provider'
+import BitcoinNetworks from '@liquality/bitcoin-networks'
+import * as crypto from '@liquality/crypto'
+
+const userBtc = new Client()
+userBtc.addProvider(new BitcoinBitcoreRpcProvider('http://localhost:4321/bitcoind/', 'bitcoin', 'local321'))
+userBtc.addProvider(new BitcoinLedgerProvider({ network: BitcoinNetworks['bitcoin_testnet'] }))
+userBtc.addProvider(new BitcoinSwapProvider({ network: BitcoinNetworks['bitcoin_testnet'] }))
 
 export default {
   mixins: [ filters ],
@@ -156,7 +176,11 @@ export default {
       liquidity: null,
       liquidityString: null,
 
-      screen: 'wallet'
+      screen: 'wallet',
+      swapProg: false,
+      canUserClaim: false,
+      pass: null,
+      swapDone: false
     }
   },
   computed: {
@@ -180,22 +204,96 @@ export default {
       wallet = 'ledger'
     }
 
-    this.client = getClient(chain, this.network, this.transport, wallet, erc20, erc20Address, false, rpc)
+    this.client = getClient(chain, this.network, this.transport, wallet, erc20, erc20Address, 'true', rpc)
 
     this.prepare()
   },
   methods: {
+    claim: async function () {
+      this.swapProg = true
+      this.canUserClaim = false
+
+      console.log(this.pass[1])
+
+      const btcClaim = await userBtc.swap.claimSwap(...this.pass[1])
+
+      console.log('user claimed!!', btcClaim)
+
+      this.swapProg = false
+      this.swapDone = true
+    },
+    swap: async function (offer) {
+      this.offers = [ offer ]
+      this.swapProg = true
+
+      console.log(offer)
+
+      if (offer.have.currency !== 'btc') {
+        console.log('cant, just yet!')
+        return
+      }
+
+      const secret = await this.client.swap.generateSecret('test')
+
+      const secretHash = crypto.sha256(secret)
+      console.log('Secret Hash', secretHash)
+
+      const userEthAddr = (await this.client.wallet.getUnusedAddress()).address
+      const userBtcAddr = (await userBtc.wallet.getUnusedAddress()).address
+      console.log('ETH', userEthAddr)
+
+      const expiration = parseInt(Date.now() / 1000) + parseInt(Math.random() * 1000000)
+
+      const ethval = 0.01 * 1e18
+      const initSwapEth = await this.client.swap.initiateSwap(ethval, offer.want.address, userEthAddr, secretHash, expiration)
+      console.log('initSwapEth', initSwapEth)
+
+      const params = [
+        initSwapEth,
+        ethval,
+        userEthAddr,
+        userBtcAddr,
+        secretHash,
+        expiration
+      ].join('/')
+
+      const d = await axios.post(`${offer.address}/init/${params}`)
+
+      console.log('from node: swap id', d.data.id)
+
+      let i = setInterval(async () => {
+        const { data } = await axios.get(`${offer.address}/check/${d.data.id}`)
+        console.log('from node', data)
+
+        if (data.tx) {
+          clearInterval(i)
+          console.log('node has initiated the swap')
+
+          this.pass = [
+            [ data.tx, data.value, userBtcAddr, offer.have.address, secretHash, expiration ],
+            [ data.tx, userBtcAddr, offer.have.address, secret, expiration ]
+          ]
+
+          await userBtc.swap.verifyInitiateSwapTransaction(data.tx, data.value, userBtcAddr, offer.have.address, secretHash, expiration)
+          console.log('found & verified btc tx')
+
+          this.swapProg = false
+          this.canUserClaim = true
+        }
+      }, 2000)
+    },
     prepare: async function () {
       try {
         const getUnusedPromise = this.client.wallet.getUnusedAddress()
-        const _offers = await this.client.discovery.getOffers()
+        const _offers = await getOffers()
         const o = []
         const c = {}
 
         _offers.forEach(({ alias, address, offers }) => {
           this.agents = this.agents + 1
           offers.forEach(offer => {
-            if (!c[offer.currency]) c[offer.currency] = {}
+            if (!c[offer.have.currency]) c[offer.have.currency] = 0
+            c[offer.have.currency] += offer.have.max
 
             o.push({
               alias,
@@ -205,10 +303,13 @@ export default {
           })
         })
 
-        console.log(o)
+        const str = []
 
-        // asd
+        Object.entries(c).map(([ cur, max ]) => {
+          str.push(`${max} ${cur.toUpperCase()}`)
+        })
 
+        this.liquidityString = str.join(' / ')
         this.offers = o
 
         // this.liquidity = this.offers.reduce((acc, offer) => {
