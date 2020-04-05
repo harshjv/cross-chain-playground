@@ -1,6 +1,9 @@
 {
   "name": "cross-chain-playground",
   "private": true,
+  "engines": {
+    "node": "^12.16.1"
+  },
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build && cp ./_headers ./dist && cp ./_redirects ./dist",
