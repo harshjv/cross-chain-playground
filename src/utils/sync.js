@@ -3,7 +3,8 @@ import router from '@/router'
 import { checkNetwork, getDefaultNetworkName } from '@/utils/networks'
 import { checkWallet, getDefaultWallet } from '@/utils/wallets'
 import { checkTransport, getDefaultTransport } from '@/utils/transports'
-import { checkRpc, getDefaultRpc } from '@/utils/rpc'
+import { checkAddressType, getDefaultAddressType } from '@/utils/addressTypes'
+// import { checkRpc, getDefaultRpcConfig } from '@/utils/rpc'
 
 export const checkQs = (key, value, init) => {
   let changed = false
@@ -49,33 +50,41 @@ export const checkQs = (key, value, init) => {
     }
   }
 
-  if (!init) {
-    if (!checkRpc(query.chain, query.network, query[query.chain + 'Rpc'])) {
-      changed = true
-      const rpc = getDefaultRpc(query.chain, query.network)
-
-      const q = {
-        [query.chain + 'Rpc']: rpc[0]
-      }
-
-      if (rpc[1]) {
-        q[query.chain + 'RpcUser'] = rpc[1]
-      }
-
-      if (rpc[2]) {
-        q[query.chain + 'RpcPass'] = rpc[2]
-      }
-
-      query = {
-        ...(query || query),
-        ...q
-      }
+  if (!checkAddressType(query.chain, query.addressType)) {
+    changed = true
+    query = {
+      ...(query || query),
+      addressType: getDefaultAddressType(query.chain)
     }
   }
 
+  // if (!init) {
+  //   if (!checkRpc(query.chain, query.network, query[query.chain + 'Rpc'])) {
+  //     changed = true
+  //     const rpc = getDefaultRpcConfig(query.chain, query.network)
+  //
+  //     const q = {
+  //       [query.chain + 'Rpc']: rpc[0]
+  //     }
+  //
+  //     if (rpc[1]) {
+  //       q[query.chain + 'RpcUser'] = rpc[1]
+  //     }
+  //
+  //     if (rpc[2]) {
+  //       q[query.chain + 'RpcPass'] = rpc[2]
+  //     }
+  //
+  //     query = {
+  //       ...(query || query),
+  //       ...q
+  //     }
+  //   }
+  // }
+
   if (query.chain !== 'eth' && query.erc20) {
     changed = true
-    query.erc20 = ''
+    query.erc20 = false
   }
 
   return {

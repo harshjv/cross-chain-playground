@@ -8,16 +8,12 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     chain: 'btc',
-    transport: 'usb',
     network: 'bitcoin',
     wallet: 'ledger',
-    btcRpc: 'https://liquality.io/bitcoinrpc/',
-    btcRpcUser: 'liquality',
-    btcRpcPass: 'liquality123',
-    ethRpc: 'https://mainnet.infura.io/v3/da99ebc8c0964bb8bb757b6f8cc40f1f',
-    erc20: '',
-    erc20Address: '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
-    atomicSwap: ''
+    transport: 'usb',
+    addressType: 'bech32',
+    erc20: false,
+    atomicSwap: false
   },
   mutations: {
     NAVIGATE (state, { key, value }) {

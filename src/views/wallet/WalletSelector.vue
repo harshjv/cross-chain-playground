@@ -4,7 +4,7 @@
       <h2>{{currency.ticker}} on {{network | pretty}}</h2>
       <p class="lead">Select your wallet</p>
       <div class="row justify-content-center mb-4">
-        <div class="col-md-4" v-for="w in wallets">
+        <div class="col-md-4" v-for="w in wallets" :key="w.name">
           <div :class="{
               'card mt-3 mb-3 clickable': true,
               'grayout': wallet && w.name !== wallet.name
@@ -18,7 +18,7 @@
       <div v-if="wallet">
         <p class="lead mb-1">How would you like to connect your {{wallet.name}}?</p>
         <div class="row justify-content-center">
-          <div class="col-md-3" v-for="transport in transports">
+          <div class="col-md-3" v-for="transport in transports" :key="transport">
             <div class="card mt-3 mb-3 clickable" @click="selectTransport(transport)">
               <div class="card-body">
                 <h2 class="h5 mb-0">{{transport | pretty}}</h2>
@@ -29,20 +29,18 @@
       </div>
       <p><router-link :to="{ path: '/wallet' }" class="small label">&larr; Go back</router-link></p>
     </div>
-    <Wallet v-else :currency="currency" :wallet="wallet" :network="network" :transport="transport" />
+    <Wallet v-else :currency="currency" :wallet="wallet" :network="network" :transport="transport" :addressType="addressType" />
   </div>
 </template>
 
 <script>
 import filters from '@/mixins/filters'
 import { findCurrency, findWallets } from '@/utils/currency'
-import ErrorComp from '@/components/Error'
 import Wallet from '@/components/Wallet'
 
 export default {
   mixins: [ filters ],
   components: {
-    ErrorComp,
     Wallet
   },
   data: function () {
@@ -58,11 +56,12 @@ export default {
     }
   },
   created: function () {
-    const { id, network } = this.$route.params
+    const { id, network, addressType } = this.$route.params
 
     this.network = network
     this.currency = findCurrency(id)
     this.wallets = findWallets(this.currency.chain)
+    this.addressType = addressType
   },
   methods: {
     selectWallet: function (wallet) {

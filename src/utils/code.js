@@ -3,6 +3,8 @@ import javascript from 'highlight.js/lib/languages/javascript'
 import xml from 'highlight.js/lib/languages/xml'
 import 'highlight.js/styles/github.css'
 
+import { getDefaultRpcConfig } from '@/utils/rpc'
+
 hljs.registerLanguage('javascript', javascript)
 hljs.registerLanguage('xml', xml)
 
@@ -17,13 +19,13 @@ export const chainMap = {
   Bitcoin: 'btc'
 }
 
-export const getLibs = (chain, transport, wallet, erc20, atomicSwap) => {
+export const getLibs = (chain, transport, wallet, erc20) => {
   let libs = [ 'client' ]
   let swapProvider = false
 
   if (chain === 'btc') {
     libs = libs.concat([
-      'bitcoin-bitcore-rpc-provider',
+      'bitcoin-esplora-api-provider',
       'bitcoin-ledger-provider',
       'bitcoin-networks'
     ])
@@ -36,22 +38,22 @@ export const getLibs = (chain, transport, wallet, erc20, atomicSwap) => {
       'ethereum-networks'
     ])
 
-    if (erc20 === 'true') {
+    if (erc20) {
       libs.push('ethereum-erc20-provider')
     }
   }
 
-  if (atomicSwap === 'true') {
-    if (chain === 'btc') {
-      swapProvider = 'bitcoin-swap-provider'
-    } else {
-      if (erc20 === 'true') {
-        swapProvider = 'ethereum-erc20-swap-provider'
-      } else {
-        swapProvider = 'ethereum-swap-provider'
-      }
-    }
-  }
+  // if (atomicSwap === 'true') {
+  //   if (chain === 'btc') {
+  //     swapProvider = 'bitcoin-swap-provider'
+  //   } else {
+  //     if (erc20 === 'true') {
+  //       swapProvider = 'ethereum-erc20-swap-provider'
+  //     } else {
+  //       swapProvider = 'ethereum-swap-provider'
+  //     }
+  //   }
+  // }
 
   if (swapProvider) {
     libs = libs.concat([ swapProvider ])
@@ -72,7 +74,7 @@ export const makeLibsImportable = (libs, type) => {
     }
 
     return [
-      `<script src="https://cdn.jsdelivr.net/npm/@liquality/${lib}@0.2.3/dist/${lib}.min.js"></script>`,
+      `<script src="https://cdn.jsdelivr.net/npm/@liquality/${lib}@0.4.25/dist/${lib}.min.js"></script>`,
       `<!-- available as window.${CamelCase(lib)} -->\n`
     ].join('\n')
   }).join('\n')
@@ -88,7 +90,7 @@ export const highlight = (code) => {
   return hljs.highlight('javascript', code).value
 }
 
-export const getCode = (libs, chain, network, transport, erc20Address, rpc) => {
+export const getCode = (libs, chain, network, transport, addressType, erc20) => {
   const code = [
     `const client = new Client()`
   ]
@@ -100,12 +102,16 @@ export const getCode = (libs, chain, network, transport, erc20Address, rpc) => {
 
       let args = ''
 
-      if (lib.match(/rpc/)) {
-        args = `'` + rpc[chain].join(`', '`) + `'`
+      if (lib.match(/rpc/) || lib.match(/api/)) {
+        args = JSON.stringify(getDefaultRpcConfig(chain, network)).replace(/,/g, ', ').replace(/"/g, '\'').replace(/[\[|\]]/g, '')
       }
 
       if (lib.match(/ledger/)) {
         args = `{ network: ${chainMap[chain]}Networks.${network} }`
+
+        if (chain === 'btc') {
+          args = args + `, '${addressType}'`
+        }
       }
 
       if (lib.match(/metamask/)) {
@@ -113,7 +119,7 @@ export const getCode = (libs, chain, network, transport, erc20Address, rpc) => {
       }
 
       if (lib.match(/erc20-provider/)) {
-        args = `'${erc20Address}'` || `'contractAddress'`
+        args = `'${erc20}'` || `'contractAddress'`
       }
 
       const obj = `client.addProvider(new ${CamelCase(lib)}(${args}))`

@@ -1,22 +1,20 @@
 import Client from '@liquality/client'
 
-import BitcoinRpcProvider from '@liquality/bitcoin-bitcore-rpc-provider'
+import BitcoinEsploraApiProvider from '@liquality/bitcoin-esplora-api-provider'
 import BitcoinLedgerProvider from '@liquality/bitcoin-ledger-provider'
-import BitcoinSwapProvider from '@liquality/bitcoin-swap-provider'
 
 import EthereumRpcProvider from '@liquality/ethereum-rpc-provider'
 import EthereumLedgerProvider from '@liquality/ethereum-ledger-provider'
-import EthereumErc20Provider from '@liquality/ethereum-erc20-provider'
 import EthereumMetaMaskProvider from '@liquality/ethereum-metamask-provider'
-import EthereumSwapProvider from '@liquality/ethereum-swap-provider'
-import EthereumErc20SwapProvider from '@liquality/ethereum-erc20-swap-provider'
+import EthereumErc20Provider from '@liquality/ethereum-erc20-provider'
 
 import { networks } from '@/utils/networks'
+import { getDefaultRpcConfig } from '@/utils/rpc'
 
 const CLIENT_CACHE = {}
 
 const RpcProviders = {
-  btc: BitcoinRpcProvider,
+  btc: BitcoinEsploraApiProvider,
   eth: EthereumRpcProvider
 }
 
@@ -25,40 +23,35 @@ const LedgerProviders = {
   eth: EthereumLedgerProvider
 }
 
-export const getClient = (chain, network, transport, wallet, erc20, erc20Address, atomicSwap, rpc) => {
-  const key = chain + network + transport + wallet + erc20 + erc20Address + atomicSwap + rpc[chain].join('')
+export const getClient = (chain, network, wallet, transport, addressType, erc20) => {
+  wallet = wallet.toLowerCase()
 
+  const key = chain + network + transport + wallet + addressType + erc20
   if (CLIENT_CACHE[key]) return CLIENT_CACHE[key]
 
   const client = new Client()
-  client.addProvider(new RpcProviders[chain](...rpc[chain]))
+  client.addProvider(new RpcProviders[chain](...getDefaultRpcConfig(chain, network)))
 
   let walletProvider
 
-  if (wallet === 'metamask' && chain === 'eth') {
+  if (wallet.match(/metamask/)) {
     walletProvider = new EthereumMetaMaskProvider(window.web3.currentProvider, networks[chain][network])
   } else {
-    walletProvider = new LedgerProviders[chain]({ network: networks[chain][network] })
+    const args = [{ network: networks[chain][network] }]
+
+    if (chain === 'btc') {
+      args.push(addressType)
+    }
+
+    walletProvider = new LedgerProviders[chain](...args)
   }
 
   if (transport === 'ble') walletProvider.useWebBle()
   client.addProvider(walletProvider)
 
   if (chain === 'eth') {
-    if (erc20 === 'true') {
-      client.addProvider(new EthereumErc20Provider(erc20Address))
-
-      if (atomicSwap === 'true') {
-        client.addProvider(new EthereumErc20SwapProvider())
-      }
-    } else {
-      if (atomicSwap === 'true') {
-        client.addProvider(new EthereumSwapProvider())
-      }
-    }
-  } else {
-    if (atomicSwap === 'true') {
-      client.addProvider(new BitcoinSwapProvider(networks[chain][network]))
+    if (erc20) {
+      client.addProvider(new EthereumErc20Provider(erc20))
     }
   }
 

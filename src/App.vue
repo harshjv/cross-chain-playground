@@ -6,10 +6,10 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <router-link class="nav-link" to="/">Library</router-link>
+              <router-link class="nav-link" exact-active-class="active" to="/">Library</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/wallet">Wallet</router-link>
+              <router-link class="nav-link" exact-active-class="active" to="/wallet">Wallet</router-link>
             </li>
           </ul>
         </div>

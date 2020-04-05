@@ -1,13 +1,8 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import Library from './layouts/Library.vue'
-import WalletLayout from './layouts/Wallet.vue'
-
-import LibraryHome from './views/library/Home.vue'
-
-import Selection from './views/wallet/Selection.vue'
-import Wallet from './views/wallet/Wallet.vue'
+import LibraryLayout from '@/layouts/LibraryLayout.vue'
+import WalletLayout from '@/layouts/WalletLayout.vue'
 
 Vue.use(Router)
 
@@ -17,12 +12,12 @@ export default new Router({
   routes: [
     {
       path: '/',
-      component: Library,
+      component: LibraryLayout,
       children: [
         {
           path: '',
           name: 'home',
-          component: LibraryHome
+          component: () => import('@/views/Library.vue')
         }
       ]
     },
@@ -33,12 +28,12 @@ export default new Router({
         {
           path: '',
           name: 'wallet',
-          component: Selection
+          component: () => import('@/views/wallet/CurrencySelector.vue')
         },
         {
-          path: ':id/:network',
+          path: ':id/:network/:addressType',
           name: 'currency_network_wallet',
-          component: Wallet
+          component: () => import('@/views/wallet/WalletSelector.vue')
         }
       ]
     }

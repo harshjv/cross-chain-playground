@@ -7,7 +7,7 @@ export const networks = {
 }
 
 export const getNetworkNames = (chain) => {
-  return Object.keys(networks[chain]).filter(n => n !== 'version' && !n.startsWith('classic'))
+  return Object.keys(networks[chain]).filter(key => key !== 'version' && !key.startsWith('classic') && !key.endsWith('regtest') && key !== 'local')
 }
 
 export const getDefaultNetworkName = (chain) => {

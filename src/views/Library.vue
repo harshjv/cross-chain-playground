@@ -34,25 +34,19 @@ import { highlight } from '@/utils/code'
 import Code from '@/components/Code'
 
 export default {
-  name: 'Home',
   components: {
     Code
   },
   computed: {
-    ...mapState([ 'chain', 'network', 'transport', 'wallet', 'erc20', 'erc20Address', 'atomicSwap', 'btcRpc', 'btcRpcUser', 'btcRpcPass', 'ethRpc' ]),
+    ...mapState([ 'chain', 'network', 'transport', 'wallet', 'addressType', 'erc20', 'erc20Address', 'atomicSwap' ]),
     client: function () {
       const client = getClient(
         this.chain,
         this.network,
-        this.transport,
         this.wallet,
-        this.erc20,
-        this.erc20Address,
-        this.atomicSwap,
-        {
-          btc: [ this.btcRpc, this.btcRpcUser, this.btcRpcPass ],
-          eth: [ this.ethRpc ]
-        }
+        this.transport,
+        this.addressType,
+        this.erc20 ? this.erc20Address : false
       )
 
       this.$win.client = client
