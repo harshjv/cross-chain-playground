@@ -15,13 +15,6 @@
         <Code value="const sign = await client.wallet.signMessage('hello', unusedAddress)" @click="exec('sign', $event)" />
       </div>
     </div>
-
-    <div class="card mt-4" v-if="atomicSwap === 'true'">
-      <div class="card-body">
-        <h2 class="h5 mb-3">Atomic Swap ⚡️</h2>
-        <Code value="const secret = await client.swap.generateSecret('msg')" @click="exec('secret', $event)" />
-      </div>
-    </div>
   </div>
 </template>
 
@@ -38,7 +31,7 @@ export default {
     Code
   },
   computed: {
-    ...mapState([ 'chain', 'network', 'transport', 'wallet', 'addressType', 'erc20', 'erc20Address', 'atomicSwap' ]),
+    ...mapState([ 'chain', 'network', 'transport', 'wallet', 'addressType', 'erc20' ]),
     client: function () {
       const client = getClient(
         this.chain,
@@ -46,7 +39,7 @@ export default {
         this.wallet,
         this.transport,
         this.addressType,
-        this.erc20 ? this.erc20Address : false
+        this.erc20
       )
 
       this.$win.client = client
